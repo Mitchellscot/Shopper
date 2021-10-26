@@ -23,6 +23,16 @@ namespace Shopper
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 await Task.Delay(1000, stoppingToken);
+                try
+                {
+                    SearchCriteria.ConfirmSearchCriteria();
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+                Schedule.StartTimer();
             }
         }
     }

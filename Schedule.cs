@@ -22,9 +22,7 @@ namespace Shopper
             if (nowTime > scheduledTime)
             {
                 //random times so it doesn't look like a bot is checking it at the same times everyday
-                var randomMinutes = rando.Next(45, 76);
-                var randomSeconds = rando.Next(1, 59);
-                scheduledTime = scheduledTime.AddMinutes(randomMinutes).AddSeconds(randomSeconds);
+                scheduledTime = scheduledTime.AddMinutes(rando.Next(45, 76)).AddSeconds(rando.Next(1, 59));
             }
             WriteLine($"Timer started at {nowTime} Going shopping at {scheduledTime}");
             double tickTime = (double)(scheduledTime - DateTime.Now).TotalMilliseconds;
@@ -37,8 +35,6 @@ namespace Shopper
         {
             WriteLine($"Starting to shop at {DateTime.Now}");
             timer.Stop();
-
-            GoShopping();
 
             StartTimer();
         }
