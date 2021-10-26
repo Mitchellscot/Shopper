@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using static System.Console;
 
 namespace Shopper
 {
@@ -52,7 +51,7 @@ namespace Shopper
                 }
                 //email results to myself
                 var subject = $"You have {filteredItems.Count} item(s) for review";
-                new AwsEmail(subject, filteredItems).SendEmail();
+                new AwsEmail(subject, filteredItems, null, null).SendEmail();
             }
         }
 

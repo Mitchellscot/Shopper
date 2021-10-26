@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using System.Timers;
 using static System.Console;
 
@@ -20,7 +21,7 @@ namespace Shopper
 
         }
 
-        public void StartTimer()
+        public async Task StartTimer()
         {
             DateTime nowTime = DateTime.Now;
             //off time so it doesn't look like a bot
@@ -35,19 +36,11 @@ namespace Shopper
                 //random times so it doesn't look like a bot is checking it at the same times everyday
                 scheduledTime = scheduledTime.AddMinutes(_random.Next(45, 76)).AddSeconds(_random.Next(1, 59));
             }
-            WriteLine($"Timer started at {nowTime} Going shopping at {scheduledTime}");
+            _logger.LogInformation($"Timer started at {nowTime} Going shopping at {scheduledTime}");
             double tickTime = (double)(scheduledTime - DateTime.Now).TotalMilliseconds;
-            timer = new Timer(tickTime);
-            timer.Elapsed += new ElapsedEventHandler(StartShopping);
-            timer.Start();
-        }
-
-        public void StartShopping(object sender, ElapsedEventArgs e)
-        {
-            WriteLine($"Starting to shop at {DateTime.Now}");
-            timer.Stop();
+            await Task.Delay(Convert.ToInt32(tickTime));
+            _logger.LogInformation($"Starting to shop at {DateTime.Now}");
             _shopper.GoShopping();
-            StartTimer();
         }
     }
 }

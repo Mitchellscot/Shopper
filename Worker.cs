@@ -12,11 +12,13 @@ namespace Shopper
     {
         private readonly ILogger<Worker> _logger;
         private readonly CsvStorage _csvStorage;
+        private readonly Schedule _schedule;
 
-        public Worker(ILogger<Worker> logger, CsvStorage csvStorage)
+        public Worker(ILogger<Worker> logger, CsvStorage csvStorage, Schedule schedule)
         {
             _logger = logger;
             _csvStorage = csvStorage;
+            _schedule = schedule;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,8 +31,7 @@ namespace Shopper
                 {
                     var searchCriteria = _csvStorage.CheckForSearchCriteria();
                     _logger.LogInformation($"Here is the search term: \"{searchCriteria.searchterm}\" and url: \"{searchCriteria.url}\" - Please edit the CSV File if you want another search term or URL to search.");
-                    Schedule.StartTimer();
-                    Task.Run();
+                    await Task.Run(() => _schedule.StartTimer(), stoppingToken);
                 }
                 catch (Exception ex)
                 {

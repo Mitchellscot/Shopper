@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Shopper
@@ -19,6 +21,18 @@ namespace Shopper
             .UseSystemd()
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddSingleton<Schedule>((container) => {
+                    var scheduleLogger = container.GetRequiredService<ILogger<Schedule>>();
+                    var shopperLogger = container.GetRequiredService<ILogger<Shopper>>();
+                    var csvLogger = container.GetRequiredService<ILogger<CsvStorage>>();
+                        return new Schedule(new Random(), scheduleLogger, new Shopper(new CsvStorage(csvLogger, new StringBuilder()), shopperLogger, new HtmlAgilityPack.HtmlWeb()));
+                    });
+
+                services.AddSingleton<CsvStorage>((container) => {
+                    var csvLogger = container.GetRequiredService<ILogger<CsvStorage>>();
+                    return new CsvStorage(csvLogger, new StringBuilder());
+                });
+
                     services.AddHostedService<Worker>();
                 });
     }
