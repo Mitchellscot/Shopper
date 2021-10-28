@@ -49,10 +49,6 @@ namespace shopper
                 //email results to myself
                 var subject = $"You have {filteredItems.Count} item(s) for review";
                 var emailReponse = new AwsEmail(subject, filteredItems).SendEmail();
-                if (!emailReponse.IsCompletedSuccessfully)
-                {
-                    WriteLine($"HEY MITCH - ERROR SENDING EMAIL {emailReponse.Exception}");
-                }
             }
         }
 
@@ -108,6 +104,7 @@ namespace shopper
                 };
                 products.Add(newProduct);
             }
+            
             return products;
         }
         private async Task<HtmlDocument> GoScraping(string url)

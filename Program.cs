@@ -21,8 +21,7 @@ namespace shopper
             .UseSystemd()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddSingleton<CsvStorage>();
-                    services.AddSingleton<Schedule>();
+                    services.AddTransient<Schedule>();
                     services.AddHostedService<Shopper>();
                 });
     }

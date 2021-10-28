@@ -8,10 +8,9 @@ namespace shopper
 {
     public class Schedule
     {
-        private Random _random;
-        public Schedule(Random random) => _random = random;
         public async Task StartTimer()
         {
+            var _random = new Random();
             DateTime nowTime = DateTime.Now;
             //off time so it doesn't look like a bot
             DateTime eveningOffTime = new DateTime(nowTime.Year, nowTime.Month, nowTime.Day, 22, 0, 0, 0);
@@ -27,7 +26,7 @@ namespace shopper
             }
             WriteLine($"Timer started at {nowTime} Going shopping at {scheduledTime}");
             double tickTime = (double)(scheduledTime - DateTime.Now).TotalMilliseconds;
-            await Task.Delay(Convert.ToInt32(tickTime));
+            await Task.Delay(Convert.ToInt32(10000));
             WriteLine($"Starting to shop at {DateTime.Now}");
         }
     }
