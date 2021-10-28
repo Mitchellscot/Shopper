@@ -1,7 +1,6 @@
 ﻿using System;
 
-
-namespace Shopper
+namespace shopper
 {
     public class Product
     {

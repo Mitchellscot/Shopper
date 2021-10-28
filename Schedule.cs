@@ -4,23 +4,12 @@ using System.Threading.Tasks;
 using System.Timers;
 using static System.Console;
 
-namespace Shopper
+namespace shopper
 {
     public class Schedule
     {
-        private Timer timer;
         private Random _random;
-        private readonly ILogger<Schedule> _logger;
-        private readonly Shopper _shopper;
-
-        public Schedule(Random random, ILogger<Schedule> logger, Shopper shopper)
-        {
-            _random = random;
-            _logger = logger;
-            _shopper = shopper;
-
-        }
-
+        public Schedule(Random random) => _random = random;
         public async Task StartTimer()
         {
             DateTime nowTime = DateTime.Now;
@@ -36,11 +25,10 @@ namespace Shopper
                 //random times so it doesn't look like a bot is checking it at the same times everyday
                 scheduledTime = scheduledTime.AddMinutes(_random.Next(45, 76)).AddSeconds(_random.Next(1, 59));
             }
-            _logger.LogInformation($"Timer started at {nowTime} Going shopping at {scheduledTime}");
+            WriteLine($"Timer started at {nowTime} Going shopping at {scheduledTime}");
             double tickTime = (double)(scheduledTime - DateTime.Now).TotalMilliseconds;
             await Task.Delay(Convert.ToInt32(tickTime));
-            _logger.LogInformation($"Starting to shop at {DateTime.Now}");
-            _shopper.GoShopping();
+            WriteLine($"Starting to shop at {DateTime.Now}");
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "Shopper": {
+    "shopper": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "environmentVariables": {

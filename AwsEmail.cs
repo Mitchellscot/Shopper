@@ -1,34 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
-using Microsoft.Extensions.Logging;
 using static System.Console;
 
-namespace Shopper
+namespace shopper
 {
     public class AwsEmail
     {
         const string SENDING = "mitchellscott@me.com";
         const string RECIEVING = "mittscotchell@gmail.com";
-        private readonly ILogger<AwsEmail> _logger;
         private readonly string _subject;
-        private readonly StringBuilder _stringBuilder;
 
         public string TextBody { get; set; }
         public string HtmlBody { get; set; }
-        public AwsEmail(string subject, List<Product> items, ILogger<AwsEmail> logger, StringBuilder stringBuilder)
+        public AwsEmail(string subject, List<Product> items)
         {
-            _logger = logger;
             _subject = subject;
             this.CreateEmail(items);
-            _stringBuilder = stringBuilder;
-
         }
 
         private void CreateEmail(List<Product> items)
         {
+            var _stringBuilder = new StringBuilder();
             _stringBuilder.AppendLine("<h3>Here is the latest...</h3>");
             _stringBuilder.AppendLine("<table><thead><tr><th><h4>Title</h4></th><th><h4>Price</h4></th><th><h4>Location</h4></th><th><h4>Date</h4></th></tr></thead><tbody>");
             foreach (var item in items)
@@ -52,7 +48,7 @@ namespace Shopper
             _stringBuilder.Clear();
         }
 
-        public async void SendEmail()
+        public async Task SendEmail()
         {
             using (var client = new AmazonSimpleEmailServiceClient(Amazon.RegionEndpoint.USEast2))
             {
@@ -83,13 +79,12 @@ namespace Shopper
                 };
                 try
                 {
-                    _logger.LogInformation($"Preparing to send an email...");
                     var response = await client.SendEmailAsync(sendRequest);
-                    _logger.LogInformation($"Email sent! {response.HttpStatusCode}");
+                    WriteLine($"Email sent! {response.HttpStatusCode}");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"HEY MITCH - ERROR SENDING EMAIL {ex.Message}");
+                    WriteLine($"HEY MITCH - ERROR SENDING EMAIL {ex.Message}");
                 }
             }
         }
