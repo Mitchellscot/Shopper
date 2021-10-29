@@ -442,5 +442,5 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 .DS_Store
-appsettings.Local.json
+appsettings.Development.json
 *.csv

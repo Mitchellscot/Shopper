@@ -1,8 +1,9 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Shopper.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,19 +15,17 @@ namespace shopper
     {
         private readonly ILogger<Shopper> _logger;
         private readonly Schedule _schedule;
+        private readonly IOptions<Settings> _settings;
 
-        public Shopper(ILogger<Shopper> logger, Schedule schedule) => (_logger, _schedule) = (logger, schedule);
+        public Shopper(ILogger<Shopper> logger, Schedule schedule, IOptions<Settings> settings) => (_logger, _schedule, _settings) = (logger, schedule, settings);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            WriteLine($"Shopper running at: {DateTimeOffset.Now}");
-            var _csv = new CsvStorage(new StringBuilder());
-            var scraper = new Scraper(_csv);
+            var _csv = new CsvStorage(new StringBuilder(), _settings);
+            var scraper = new Scraper(_csv, _settings);
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var searchCriteria = await _csv.GetSearchCriteriaAsync();
-                WriteLine($"Here is the search term: \"{searchCriteria.searchterm}\" and url: \"{searchCriteria.url}\" - Please edit the CSV File if you want another search term or URL to search.");
                 await _schedule.StartTimer();
                 scraper.GoShopping();
             }

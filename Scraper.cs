@@ -1,5 +1,8 @@
 ﻿using HtmlAgilityPack;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Shopper.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,14 +16,15 @@ namespace shopper
     public class Scraper
     {
         private readonly CsvStorage _csv;
+        private readonly IOptions<Settings> _settings;
 
-        public Scraper(CsvStorage csv) => _csv = csv;
+        public Scraper(CsvStorage csv, IOptions<Settings> settings) => (_csv, _settings) = (csv, settings);
 
         public void GoShopping()
         {
             var searchCriteria = _csv.GetSearchCriteriaAsync().Result;
-            string fileName = searchCriteria.searchterm.ToString() + ".csv";
-            _csv.CheckForCsvFileAsync(fileName);
+            string fileName = "./Files/" + searchCriteria.searchterm.ToString() + ".csv";
+            _csv.CheckForProductListFile(fileName);
             //bring in data from csv file to prevent finding the same items over and over again
             var previouslyFoundItems = CsvStorage.ProcessFileAsync(fileName);
             //go shopping at the given url
@@ -44,11 +48,11 @@ namespace shopper
             {
                 foreach (var item in filteredItems)
                 {
-                    _csv.WriteToCsvFileAsync(item, fileName);
+                    _csv.WriteToProductListFile(item, fileName);
                 }
                 //email results to myself
                 var subject = $"You have {filteredItems.Count} item(s) for review";
-                var emailReponse = new AwsEmail(subject, filteredItems).SendEmail();
+                var emailReponse = new AwsEmail(subject, filteredItems, _settings).SendEmail();
             }
         }
 

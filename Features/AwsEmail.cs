@@ -4,20 +4,23 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Shopper.Models;
 using static System.Console;
 
 namespace shopper
 {
     public class AwsEmail
     {
-        const string SENDING = "mitchellscott@me.com";
-        const string RECIEVING = "mittscotchell@gmail.com";
+        private readonly IOptions<Settings> _settings;
         private readonly string _subject;
 
         public string TextBody { get; set; }
         public string HtmlBody { get; set; }
-        public AwsEmail(string subject, List<Product> items)
+        public AwsEmail(string subject, List<Product> items, IOptions<Settings> settings)
         {
+            _settings = settings;
             _subject = subject;
             this.CreateEmail(items);
         }
@@ -54,10 +57,10 @@ namespace shopper
             {
                 var sendRequest = new SendEmailRequest
                 {
-                    Source = SENDING,
+                    Source = _settings.Value.FromAddress,
                     Destination = new Destination
                     {
-                        ToAddresses = new List<string> { RECIEVING }
+                        ToAddresses = new List<string> { _settings.Value.ToAddress }
                     },
                     Message = new Message
                     {
