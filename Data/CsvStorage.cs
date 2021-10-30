@@ -104,17 +104,18 @@ namespace shopper
                 throw;
             }
         }
-        public async Task<Dictionary<string, string>> GetSettingsFromFile()
+        public async Task<Settings> GetSettingsFromFile()
         {
             try
             {
                 var line = await File.ReadAllLinesAsync(SEARCHTERM_FILE);
                 var values = line.Skip(1).Where(l => l.Length > 1).Last().Split(',');
-                var settings = new Dictionary<string, string>() {
-                    { "ToAddress", values[0] },
-                    { "FromAddress", values[1] },
-                    { "SearchTerm", values[2] },
-                    { "Url", values[3]}
+                var settings = new Settings()
+                {
+                    FromAddress = values[0],
+                    ToAddress = values[1],
+                    SearchTerm = values[2],
+                    Url = values[3]
                 };
                 return settings;
             }
@@ -125,11 +126,12 @@ namespace shopper
                 _sb.AppendLine(_settings.Value.ToAddress + "," + _settings.Value.FromAddress + "," + _settings.Value.SearchTerm + "," + _settings.Value.Url);
                 await File.WriteAllTextAsync(SETTINGS_FILE, _sb.ToString());
                 _sb.Clear();
-                var settings = new Dictionary<string, string>() {
-                    { "ToAddress", _settings.Value.ToAddress },
-                    { "FromAddress", _settings.Value.FromAddress },
-                    { "SearchTerm", _settings.Value.SearchTerm },
-                    { "Url", _settings.Value.Url}
+                var settings = new Settings()
+                {
+                    FromAddress = _settings.Value.ToAddress,
+                    ToAddress = _settings.Value.FromAddress,
+                    SearchTerm = _settings.Value.SearchTerm,
+                    Url = _settings.Value.Url
                 };
                 return settings;
             }

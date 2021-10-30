@@ -25,7 +25,8 @@ namespace shopper
                 {
                     IConfiguration configuration = hostContext.Configuration;
                     Settings options = configuration.GetSection("Settings").Get<Settings>();
-                    services.AddScoped(options);
+                    services.AddScoped<Settings>();
+                    services.AddScoped<CsvStorage>();
                     //figure this out https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-5.0
 
                     services.Configure<ConsoleLifetimeOptions>(options =>

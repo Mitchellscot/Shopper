@@ -16,9 +16,9 @@ namespace shopper
     public class Scraper
     {
         private readonly CsvStorage _csv;
-        private readonly IOptions<Settings> _settings;
+        private readonly Settings _settings;
 
-        public Scraper(CsvStorage csv, IOptions<Settings> settings) => (_csv, _settings) = (csv, settings);
+        public Scraper(CsvStorage csv) => (_csv) = (csv);
 
         public void GoShopping()
         {
@@ -52,7 +52,7 @@ namespace shopper
                 }
                 //email results to myself
                 var subject = $"You have {filteredItems.Count} item(s) for review";
-                var emailReponse = new AwsEmail(subject, filteredItems, _settings).SendEmail();
+                var emailReponse = new AwsEmail(subject, filteredItems, _csv).SendEmail();
             }
         }
 

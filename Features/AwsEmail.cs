@@ -13,14 +13,14 @@ namespace shopper
 {
     public class AwsEmail
     {
-        private readonly IOptions<Settings> _settings;
+        private readonly CsvStorage _data;
         private readonly string _subject;
 
         public string TextBody { get; set; }
         public string HtmlBody { get; set; }
-        public AwsEmail(string subject, List<Product> items, IOptions<Settings> settings)
+        public AwsEmail(string subject, List<Product> items, CsvStorage data)
         {
-            _settings = settings;
+            _data = data;
             _subject = subject;
             this.CreateEmail(items);
         }
@@ -57,10 +57,10 @@ namespace shopper
             {
                 var sendRequest = new SendEmailRequest
                 {
-                    Source = _settings.Value.FromAddress,
+                    Source = _data.GetSettingsFromFile().Result.FromAddress,
                     Destination = new Destination
                     {
-                        ToAddresses = new List<string> { _settings.Value.ToAddress }
+                        ToAddresses = new List<string> { _data.GetSettingsFromFile().Result.ToAddress }
                     },
                     Message = new Message
                     {

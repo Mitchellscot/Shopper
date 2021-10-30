@@ -22,7 +22,7 @@ namespace shopper
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var _csv = new CsvStorage(new StringBuilder(), _settings);
-            var scraper = new Scraper(_csv, _settings);
+            var scraper = new Scraper(_csv);
 
             while (!stoppingToken.IsCancellationRequested)
             {
