@@ -9,31 +9,30 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using static System.Console;
 
 namespace shopper
 {
     public class Scraper
     {
-        private readonly CsvStorage _csv;
-        private readonly Settings _settings;
+        private readonly CsvStorage _data;
 
-        public Scraper(CsvStorage csv) => (_csv) = (csv);
+        public Scraper(CsvStorage data) => (_data) = (data);
 
-        public void GoShopping()
+        public List<Product> GoShopping()
         {
-            var searchCriteria = _csv.GetSearchCriteriaAsync().Result;
-            string fileName = "./Files/" + searchCriteria.searchterm.ToString() + ".csv";
-            _csv.CheckForProductListFile(fileName);
+            (string searchTerm, string url) = (_data.GetSettingsFromFile().Result.SearchTerm, _data.GetSettingsFromFile().Result.Url);
+            string fileName = $"./Files/{searchTerm}.csv";
             //bring in data from csv file to prevent finding the same items over and over again
-            var previouslyFoundItems = CsvStorage.ProcessFileAsync(fileName);
+            var previouslyFoundItems = CsvStorage.GetProductListAsync(fileName);
             //go shopping at the given url
-            var foundItems = Scrape(searchCriteria.url).Result;
+            var foundItems = scrape(url).Result;
             //find all items with given search term. If not found previously, add it to the list of new items
             var filteredItems = new List<Product>();
             foreach (var item in foundItems)
             {
-                if (item.Title.ToLower().Contains(searchCriteria.searchterm))
+                if (item.Title.ToLower().Contains(searchTerm))
                 {
                     WriteLine($"Found an item: {item.Title} - {item.Price} - {item.Location} - {item.ProductDate} - {item.Link}");
                     if (!previouslyFoundItems.Result.Any(x => x.ProductDate == item.ProductDate))
@@ -43,20 +42,10 @@ namespace shopper
                     }
                 }
             }
-            //write items to file
-            if (filteredItems.Count > 0)
-            {
-                foreach (var item in filteredItems)
-                {
-                    _csv.WriteToProductListFile(item, fileName);
-                }
-                //email results to myself
-                var subject = $"You have {filteredItems.Count} item(s) for review";
-                var emailReponse = new AwsEmail(subject, filteredItems, _csv).SendEmail();
-            }
+            return filteredItems;
         }
 
-        public async Task<List<Product>> Scrape(string url)
+        private async Task<List<Product>> scrape(string url)
         {
             var products = new List<Product>();
             decimal Price = 0M;
@@ -64,7 +53,7 @@ namespace shopper
             string Location = string.Empty;
             string Url = string.Empty;
             DateTime? Date = null;
-            var web = await GoScraping(url);
+            var web = await goScraping(url);
 
             var rows = web.DocumentNode.SelectNodes("//*[@class=\"result-row\"]");
             foreach (var row in rows)
@@ -94,7 +83,7 @@ namespace shopper
                 var resultHeading = row.Descendants().Where(x => x.HasClass("result-heading"));
                 foreach (var child in resultHeading)
                 {
-                    Title = child.Descendants().Where(x => x.Attributes.Contains("href")).First().InnerText;
+                    Title = HttpUtility.UrlDecode(child.Descendants().Where(x => x.Attributes.Contains("href")).First().InnerText);
                     Url = child.Descendants().Where(x => x.Attributes.Contains("href")).First().GetAttributeValue("href", "");
                 }
                 Date = DateTime.Parse(row.Descendants().Where(x => x.HasClass("result-date")).First().GetAttributeValue("datetime", "NOW"));
@@ -111,11 +100,12 @@ namespace shopper
             
             return products;
         }
-        private async Task<HtmlDocument> GoScraping(string url)
+        private async Task<HtmlDocument> goScraping(string url)
         {
             try
             {
                 var htmlDoc = new HtmlWeb();
+                WriteLine($" This is the user agent or whatever {htmlDoc.UserAgent}");
                 var webPage = await htmlDoc.LoadFromWebAsync(url);
                 return webPage;
             }

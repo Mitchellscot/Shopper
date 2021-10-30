@@ -1,13 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Shopper.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static System.Console;
 
 namespace shopper
 {
@@ -24,9 +19,9 @@ namespace shopper
                 .ConfigureServices((hostContext, services) =>
                 {
                     IConfiguration configuration = hostContext.Configuration;
-                    Settings options = configuration.GetSection("Settings").Get<Settings>();
-                    services.AddScoped<Settings>();
-                    services.AddScoped<CsvStorage>();
+                    Settings settingOptions = configuration.GetSection("Settings").Get<Settings>();
+                    services.AddSingleton(settingOptions);
+                    //services.AddTransient<Settings>();
                     //figure this out https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-5.0
 
                     services.Configure<ConsoleLifetimeOptions>(options =>
@@ -34,7 +29,6 @@ namespace shopper
 
                     services.AddTransient<Schedule>();
                     services.AddHostedService<Shopper>();
-
                 });
     }
 }
