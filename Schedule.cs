@@ -29,7 +29,6 @@ namespace shopper
             //await Task.Delay(Convert.ToInt32(tickTime));
             //for development, go faster
             await Task.Delay(Convert.ToInt32(10000));
-            WriteLine($"Starting to shop at {DateTime.Now}");
         }
     }
 }

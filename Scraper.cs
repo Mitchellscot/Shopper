@@ -6,6 +6,7 @@ using Shopper.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,18 +25,18 @@ namespace shopper
         {
             (string searchTerm, string url) = (_data.GetSettingsFromFile().Result.SearchTerm, _data.GetSettingsFromFile().Result.Url);
             string fileName = $"./Files/{searchTerm}.csv";
-            //bring in data from csv file to prevent finding the same items over and over again
             var previouslyFoundItems = CsvStorage.GetProductListAsync(fileName);
-            //go shopping at the given url
             var foundItems = scrape(url).Result;
-            //find all items with given search term. If not found previously, add it to the list of new items
-            var filteredItems = new List<Product>();
+            List<Product> filteredItems = new();
             foreach (var item in foundItems)
             {
                 if (item.Title.ToLower().Contains(searchTerm))
                 {
+
+                    //BUG
+                    //something is happening here when previouslyFoundItems is null
                     WriteLine($"Found an item: {item.Title} - {item.Price} - {item.Location} - {item.ProductDate} - {item.Link}");
-                    if (!previouslyFoundItems.Result.Any(x => x.ProductDate == item.ProductDate))
+                    if (!previouslyFoundItems.Result.Any(x => x.Title == item.Title))
                     {
                         WriteLine("NEW ITEM!");
                         filteredItems.Add(item);
@@ -102,10 +103,11 @@ namespace shopper
         }
         private async Task<HtmlDocument> goScraping(string url)
         {
+            Random rando = new();
             try
             {
-                var htmlDoc = new HtmlWeb();
-                WriteLine($" This is the user agent or whatever {htmlDoc.UserAgent}");
+                HtmlWeb htmlDoc = new();
+                htmlDoc.UserAgent = assignUserAgent().Result.ElementAt(rando.Next(1, 1000));
                 var webPage = await htmlDoc.LoadFromWebAsync(url);
                 return webPage;
             }
@@ -114,6 +116,15 @@ namespace shopper
                 WriteLine($"HEY MITCH - UNABLE TO GET THE WEB PAGE {ex.Message}");
                 throw new Exception();
             }
+        }
+        private async Task<List<string>> assignUserAgent()
+        {
+            List<string> lines = new();
+            foreach (var line in await File.ReadAllLinesAsync("./Files/user-agents.txt"))
+            {
+                lines.Add(line);
+            }
+            return lines;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace shopper
                 await _schedule.StartTimer();
                 //add a check here to see if file exists, or whatever....
                 var products = scraper.GoShopping();
-                if(products.Any())
+                if (products.Any())
                 {
                     foreach (var item in products)
                     {

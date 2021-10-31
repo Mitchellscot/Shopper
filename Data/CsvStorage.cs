@@ -7,6 +7,7 @@ using System.IO;
 using static System.Console;
 using Microsoft.Extensions.Options;
 using Shopper.Models;
+#nullable enable
 
 namespace shopper
 {
@@ -20,7 +21,7 @@ namespace shopper
             _settings = settings;
         }
 
-        public static async Task<List<Product>> GetProductListAsync(string path)
+        public static async Task<List<Product>?> GetProductListAsync(string path)
         {
             try
             {
@@ -32,16 +33,8 @@ namespace shopper
             }
             catch (FileNotFoundException)
             {
-                var _sb = new StringBuilder();
-                WriteLine($"Making a new csv file {path} ");
-                _sb.AppendLine("Title,Price,Location,ProductDate,Link");
-                await File.WriteAllTextAsync(path, _sb.ToString());
-                _sb.Clear();
-                var file = await File.ReadAllLinesAsync(path);
-                var lines = file.Skip(1)
-                    .Where(l => l.Length > 1)
-                    .ToProduct();
-                return lines.ToList();
+                createNewProductList(path);
+                return new List<Product>();
             }
             catch (Exception ex)
             {
@@ -49,10 +42,19 @@ namespace shopper
                 throw new Exception();
             }
         }
+        private static async void createNewProductList(string path)
+        {
+            var _sb = new StringBuilder();
+            WriteLine($"Making a new csv file {path} ");
+            _sb.AppendLine("Title,Price,Location,ProductDate,Link");
+            await File.WriteAllTextAsync(path, _sb.ToString());
+            _sb.Clear();
+        }
 
         public async void WriteToProductListFile(Product product)
         {
-            var ProductListPath = $"./Files/{_settings.SearchTerm}.csv";
+            //HERE
+            var ProductListPath = $"./Files/{GetSettingsFromFile().Result.SearchTerm}.csv";
             try
             {
                 var _sb = new StringBuilder();
