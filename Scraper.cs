@@ -32,6 +32,11 @@ namespace shopper
             {
                 if (item.Title.ToLower().Contains(searchTerm))
                 {
+                    if (previouslyFoundItems.Result == null)
+                    {
+                        WriteLine("NEW ITEM!");
+                        filteredItems.Add(item);
+                    }
 
                     //BUG
                     //something is happening here when previouslyFoundItems is null
@@ -52,7 +57,7 @@ namespace shopper
             decimal Price = 0M;
             string Title = string.Empty;
             string Location = string.Empty;
-            string Url = string.Empty;
+            string Link = string.Empty;
             DateTime? Date = null;
             var web = await goScraping(url);
 
@@ -68,7 +73,7 @@ namespace shopper
                         Location = child.Descendants("span").SingleOrDefault(x => x.HasClass("result-hood")).InnerText.Trim();
                         if (Location == "(  )")
                         {
-                            Location = "None Given";
+                            Location = "";
                         }
                         else
                         {
@@ -78,14 +83,20 @@ namespace shopper
                     }
                     else
                     {
-                        Location = "None Given";
+                        Location = "";
                     }
                 }
                 var resultHeading = row.Descendants().Where(x => x.HasClass("result-heading"));
                 foreach (var child in resultHeading)
                 {
                     Title = HttpUtility.UrlDecode(child.Descendants().Where(x => x.Attributes.Contains("href")).First().InnerText);
-                    Url = child.Descendants().Where(x => x.Attributes.Contains("href")).First().GetAttributeValue("href", "");
+                    Link = child.Descendants().Where(x => x.Attributes.Contains("href")).First().GetAttributeValue("href", "");
+                }
+                if (string.IsNullOrEmpty(Location))
+                {
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                    //read the definition of Substring then come back to this
+                    Location = textInfo.ToTitleCase(Link.Substring((Link.IndexOf("/"))+2, Link.IndexOf(".")));
                 }
                 Date = DateTime.Parse(row.Descendants().Where(x => x.HasClass("result-date")).First().GetAttributeValue("datetime", "NOW"));
                 var newProduct = new Product()
@@ -94,11 +105,11 @@ namespace shopper
                     ProductDate = Date.Value,
                     Price = Price,
                     Location = Location,
-                    Link = Url
+                    Link = Link
                 };
                 products.Add(newProduct);
             }
-            
+
             return products;
         }
         private async Task<HtmlDocument> goScraping(string url)
