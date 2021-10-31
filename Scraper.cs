@@ -68,7 +68,7 @@ namespace shopper
                         Location = child.Descendants("span").SingleOrDefault(x => x.HasClass("result-hood")).InnerText.Trim();
                         if (Location == "(  )")
                         {
-                            Location = "None Given";
+                            Location = null;
                         }
                         else
                         {
@@ -78,7 +78,7 @@ namespace shopper
                     }
                     else
                     {
-                        Location = "None Given";
+                        Location = null;
                     }
                 }
                 var resultHeading = row.Descendants().Where(x => x.HasClass("result-heading"));
@@ -88,6 +88,7 @@ namespace shopper
                     Url = child.Descendants().Where(x => x.Attributes.Contains("href")).First().GetAttributeValue("href", "");
                 }
                 Date = DateTime.Parse(row.Descendants().Where(x => x.HasClass("result-date")).First().GetAttributeValue("datetime", "NOW"));
+                Location ??= url.Substring(url.IndexOf("/" + 1), url.IndexOf("."));
                 var newProduct = new Product()
                 {
                     Title = Title,
