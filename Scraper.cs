@@ -88,7 +88,8 @@ namespace shopper
                     Url = child.Descendants().Where(x => x.Attributes.Contains("href")).First().GetAttributeValue("href", "");
                 }
                 Date = DateTime.Parse(row.Descendants().Where(x => x.HasClass("result-date")).First().GetAttributeValue("datetime", "NOW"));
-                Location ??= url.Substring(url.IndexOf("/" + 1), url.IndexOf("."));
+
+                Location ??= Url.Remove(Url.IndexOf(".")).Substring(Url.IndexOf("/") + 2);
                 var newProduct = new Product()
                 {
                     Title = Title,
