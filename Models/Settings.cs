@@ -1,4 +1,4 @@
-﻿namespace Shopper.Models
+﻿namespace shopper.Models
 {
     public class Settings
     {

@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using shopper.Models;
+using shopper.Helpers;
 using static System.Console;
-using Microsoft.Extensions.Options;
-using Shopper.Models;
 #nullable enable
 
-namespace shopper
+
+namespace shopper.Data
 {
     public class CsvStorage
     {

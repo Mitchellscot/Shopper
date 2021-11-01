@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace shopper
+namespace shopper.Models
 {
     public class Product
     {

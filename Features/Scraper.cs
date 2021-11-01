@@ -1,19 +1,16 @@
 ﻿using HtmlAgilityPack;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Shopper.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using shopper.Data;
+using shopper.Models;
 using static System.Console;
 
-namespace shopper
+namespace shopper.Features
 {
     public class Scraper
     {
@@ -34,16 +31,10 @@ namespace shopper
                 {
                     if (previouslyFoundItems.Result == null)
                     {
-                        WriteLine("NEW ITEM!");
                         filteredItems.Add(item);
                     }
-
-                    //BUG
-                    //something is happening here when previouslyFoundItems is null
-                    WriteLine($"Found an item: {item.Title} - {item.Price} - {item.Location} - {item.ProductDate} - {item.Link}");
                     if (!previouslyFoundItems.Result.Any(x => x.Title == item.Title))
                     {
-                        WriteLine("NEW ITEM!");
                         filteredItems.Add(item);
                     }
                 }

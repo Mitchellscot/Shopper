@@ -5,12 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Shopper.Models;
+using shopper.Data;
+using shopper.Models;
 using static System.Console;
 
-namespace shopper
+namespace shopper.Features
 {
     public class AwsEmail
     {
@@ -31,7 +30,7 @@ namespace shopper
             var _stringBuilder = new StringBuilder();
             _stringBuilder.AppendLine(EmailTop);
 
-            foreach (var product in products.OrderBy(x=> x.ProductDate))
+            foreach (var product in products.OrderByDescending(x=> x.ProductDate))
             {
                 _stringBuilder.AppendLine($"<tr><td style=\"line-height: 24px; font-size: 16px; padding-right: 12px; padding-left: 12px; margin: 0; border: 1px solid #32383e;\" align=\"left\"><a href=\"{product.Link}\" style=\"color: #0d6efd;\">{product.Title}</a></td><td style=\"line-height: 24px; font-size: 16px; padding-right: 12px; padding-left: 12px; margin: 0; border: 1px solid #32383e;\" align=\"left\"><table class=\"badge rounded-pill bg-success\" align=\"left\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"\" bgcolor=\"#198754\"><tbody><tr><td style=\"line-height: 1; font-size: 75%; display: inline-block; font-weight: 700; white-space: nowrap; border-radius: 4px; margin: 0; padding: 4px 6.4px;\" align=\"center\" bgcolor=\"#198754\" valign=\"baseline\"><span>${ product.Price } </span></td></tr></tbody></table></td><td style=\"line-height: 24px; font-size: 16px; padding-right: 12px; padding-left: 12px; margin: 0; border: 1px solid #32383e;\" align=\"left\">{product.Location}</td><td style=\"line-height: 24px; font-size: 16px; padding-right: 12px; padding-left: 12px; margin: 0; border: 1px solid #32383e;\" align=\"left\">{ product.ProductDate.ToShortDateString()}</td></tr>");
             }
