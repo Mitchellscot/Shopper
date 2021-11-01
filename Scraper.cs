@@ -92,15 +92,11 @@ namespace shopper
                     Title = HttpUtility.UrlDecode(child.Descendants().Where(x => x.Attributes.Contains("href")).First().InnerText);
                     Link = child.Descendants().Where(x => x.Attributes.Contains("href")).First().GetAttributeValue("href", "");
                 }
-                if (string.IsNullOrEmpty(Location))
-                {
-                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-                    //read the definition of Substring then come back to this
-                    Location = textInfo.ToTitleCase(Link.Substring((Link.IndexOf("/"))+2, Link.IndexOf(".")));
-                }
                 Date = DateTime.Parse(row.Descendants().Where(x => x.HasClass("result-date")).First().GetAttributeValue("datetime", "NOW"));
-
-                Location ??= Url.Remove(Url.IndexOf(".")).Substring(Url.IndexOf("/") + 2);
+                if (string.IsNullOrEmpty(Location)){
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                    Location ??= textInfo.ToTitleCase(Link.Remove(Link.IndexOf(".")).Substring(Link.IndexOf("/") + 2));
+                }
                 var newProduct = new Product()
                 {
                     Title = Title,
