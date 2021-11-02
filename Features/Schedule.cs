@@ -14,17 +14,21 @@ namespace shopper.Features
             DateTime scheduledTime = new DateTime(nowTime.Year, nowTime.Month, nowTime.Day, nowTime.Hour, 0, 0, 0);
             if (nowTime > eveningOffTime)
             {
-                scheduledTime = scheduledTime.AddHours(10);
+                scheduledTime = scheduledTime.AddHours(10).AddMinutes(_random.Next(1, 20)).AddSeconds(_random.Next(1, 59));
             }
             if (nowTime > scheduledTime)
             {
                 scheduledTime = scheduledTime.AddMinutes(_random.Next(45, 76)).AddSeconds(_random.Next(1, 59));
             }
+            if (scheduledTime < nowTime)
+            {
+                scheduledTime = scheduledTime.AddHours(1);
+            }
             WriteLine($"Timer started at {nowTime} Going shopping at {scheduledTime}");
             double tickTime = (double)(scheduledTime - DateTime.Now).TotalMilliseconds;
-            await Task.Delay(Convert.ToInt32(tickTime));
-            //for development, go faster
-            //await Task.Delay(Convert.ToInt32(10000));
+            //await Task.Delay(Convert.ToInt32(tickTime));
+            //for development, to go faster
+            await Task.Delay(Convert.ToInt32(10000));
         }
     }
 }
