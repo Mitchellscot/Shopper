@@ -26,9 +26,9 @@ namespace shopper.Features
             }
             WriteLine($"Timer started at {nowTime} Going shopping at {scheduledTime}");
             double tickTime = (double)(scheduledTime - DateTime.Now).TotalMilliseconds;
-            //await Task.Delay(Convert.ToInt32(tickTime));
+            await Task.Delay(Convert.ToInt32(tickTime));
             //for development, to go faster
-            await Task.Delay(Convert.ToInt32(10000));
+            //await Task.Delay(Convert.ToInt32(10000));
         }
     }
 }
