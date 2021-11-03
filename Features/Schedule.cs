@@ -16,11 +16,11 @@ namespace shopper.Features
             {
                 scheduledTime = scheduledTime.AddHours(10).AddMinutes(_random.Next(1, 20)).AddSeconds(_random.Next(1, 59));
             }
-            if (nowTime > scheduledTime)
+            else if (nowTime > scheduledTime)
             {
                 scheduledTime = scheduledTime.AddMinutes(_random.Next(45, 76)).AddSeconds(_random.Next(1, 59));
             }
-            if (scheduledTime < nowTime)
+            else if (scheduledTime < nowTime)
             {
                 scheduledTime = scheduledTime.AddHours(1);
             }
