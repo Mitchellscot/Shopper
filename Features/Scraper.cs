@@ -1,19 +1,16 @@
 ﻿using HtmlAgilityPack;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Shopper.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using shopper.Data;
+using shopper.Models;
 using static System.Console;
 
-namespace shopper
+namespace shopper.Features
 {
     public class Scraper
     {
@@ -34,16 +31,10 @@ namespace shopper
                 {
                     if (previouslyFoundItems.Result == null)
                     {
-                        WriteLine("NEW ITEM!");
                         filteredItems.Add(item);
                     }
-
-                    //BUG
-                    //something is happening here when previouslyFoundItems is null
-                    WriteLine($"Found an item: {item.Title} - {item.Price} - {item.Location} - {item.ProductDate} - {item.Link}");
                     if (!previouslyFoundItems.Result.Any(x => x.Title == item.Title))
                     {
-                        WriteLine("NEW ITEM!");
                         filteredItems.Add(item);
                     }
                 }
@@ -73,7 +64,7 @@ namespace shopper
                         Location = child.Descendants("span").SingleOrDefault(x => x.HasClass("result-hood")).InnerText.Trim();
                         if (Location == "(  )")
                         {
-                            Location = "";
+                            Location = null;
                         }
                         else
                         {
@@ -83,7 +74,7 @@ namespace shopper
                     }
                     else
                     {
-                        Location = "";
+                        Location = null;
                     }
                 }
                 var resultHeading = row.Descendants().Where(x => x.HasClass("result-heading"));
@@ -92,13 +83,11 @@ namespace shopper
                     Title = HttpUtility.UrlDecode(child.Descendants().Where(x => x.Attributes.Contains("href")).First().InnerText);
                     Link = child.Descendants().Where(x => x.Attributes.Contains("href")).First().GetAttributeValue("href", "");
                 }
-                if (string.IsNullOrEmpty(Location))
-                {
-                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-                    //read the definition of Substring then come back to this
-                    Location = textInfo.ToTitleCase(Link.Substring((Link.IndexOf("/"))+2, Link.IndexOf(".")));
-                }
                 Date = DateTime.Parse(row.Descendants().Where(x => x.HasClass("result-date")).First().GetAttributeValue("datetime", "NOW"));
+                if (string.IsNullOrEmpty(Location)){
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                    Location ??= textInfo.ToTitleCase(Link.Remove(Link.IndexOf(".")).Substring(Link.IndexOf("/") + 2));
+                }
                 var newProduct = new Product()
                 {
                     Title = Title,

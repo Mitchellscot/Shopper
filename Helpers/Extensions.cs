@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using shopper.Models;
 
-namespace shopper
+namespace shopper.Helpers
 {
     public static class Extensions
     {

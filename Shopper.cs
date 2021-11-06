@@ -1,24 +1,19 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Shopper.Models;
-using System;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Console;
+using shopper.Features;
+using shopper.Data;
+using shopper.Models;
 
 namespace shopper
 {
     public class Shopper : BackgroundService
     {
-        private readonly ILogger<Shopper> _logger;
         private readonly Schedule _schedule;
         private readonly Settings _settings;
 
-        public Shopper(ILogger<Shopper> logger, Schedule schedule, Settings settings) => (_logger, _schedule, _settings) = (logger, schedule, settings);
+        public Shopper(Schedule schedule, Settings settings) => (_schedule, _settings) = (schedule, settings);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -28,7 +23,6 @@ namespace shopper
             while (!stoppingToken.IsCancellationRequested)
             {
                 await _schedule.StartTimer();
-                //add a check here to see if file exists, or whatever....
                 var products = scraper.GoShopping();
                 if (products.Any())
                 {
