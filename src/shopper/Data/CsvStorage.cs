@@ -14,8 +14,6 @@ namespace shopper.Data
 {
     public class CsvStorage
     {
-        const string SEARCHTERM_FILE = "./Files/SearchCriteria.csv";
-        const string SETTINGS_FILE = "./Files/Settings.csv";
         private readonly Settings _settings;
 
         public CsvStorage(Settings settings) {
@@ -40,7 +38,7 @@ namespace shopper.Data
             catch (Exception ex)
             {
                 WriteLine($"HEY MITCH - ERROR PROCESSING THE CSV FILE - {ex.Message}");
-                throw new Exception();
+                throw new Exception(ex.Message);
             }
         }
         private static async void createNewProductList(string path)
@@ -52,10 +50,9 @@ namespace shopper.Data
             _sb.Clear();
         }
 
-        public async void WriteToProductListFile(Product product)
+        public async void WriteToProductListFile(Product product, string settingsFilePath)
         {
-            //HERE
-            var ProductListPath = $"./Files/{GetSettingsFromFile().Result.SearchTerm}.csv";
+            var ProductListPath = $"./Files/{GetSettingsFromFile(settingsFilePath).Result.SearchTerm}.csv";
             try
             {
                 var _sb = new StringBuilder();
@@ -79,11 +76,11 @@ namespace shopper.Data
                 throw new Exception();
             }
         }
-        public async Task<Settings> GetSettingsFromFile()
+        public async Task<Settings> GetSettingsFromFile(string settingsFilePath)
         {
             try
             {
-                var line = await File.ReadAllLinesAsync(SETTINGS_FILE);
+                var line = await File.ReadAllLinesAsync(settingsFilePath);
                 var values = line.Skip(1).Where(l => l.Length > 1).Last().Split(',');
                 var settings = new Settings()
                 {
@@ -100,7 +97,7 @@ namespace shopper.Data
                 WriteLine("Making a new settings file");
                 _sb.AppendLine("ToAddress,FromAddress,SearchTerm,Url");
                 _sb.AppendLine(_settings.ToAddress + "," + _settings.FromAddress + "," + _settings.SearchTerm + "," + _settings.Url);
-                await File.WriteAllTextAsync(SETTINGS_FILE, _sb.ToString());
+                await File.WriteAllTextAsync(settingsFilePath, _sb.ToString());
                 _sb.Clear();
                 var settings = new Settings()
                 {
@@ -115,42 +112,6 @@ namespace shopper.Data
             {
                 WriteLine($"HEY MITCH - ERROR ACCESSING SETTINGS FILE {ex.Message}");
                 throw;
-            }
-        }
-        //This is outdated - search criteria will be written to file with a new console program
-        public async Task WriteSearchCriteriaFile(string criteria)
-        {
-            try
-            {
-                var _sb = new StringBuilder();
-                _sb.AppendLine(criteria);
-                await File.AppendAllTextAsync(SEARCHTERM_FILE, _sb.ToString());
-                _sb.Clear();
-            }
-            catch (Exception ex)
-            {
-                WriteLine($"HEY MITCH - COULDNT WRITE TO SEARCH CRITERIA FILE {ex.Message}");
-                throw;
-            }
-        }
-        //outdated
-        public async Task<(string searchterm, string url)> GetSearchCriteriaAsync()
-        {
-            try
-            {
-                var line = await File.ReadAllLinesAsync(SEARCHTERM_FILE);
-                var tuple = line.Skip(1).Where(l => l.Length > 1).Last().Split(',');
-                return (searchterm: tuple[0], url: tuple[1]);
-            }
-            catch (FileNotFoundException)
-            {
-                var _sb = new StringBuilder();
-                WriteLine("Making a new csv file for Search Criteria");
-                _sb.AppendLine("Search Term,URL");
-                _sb.AppendLine($"{_settings.SearchTerm},{_settings.Url}");
-                await File.WriteAllTextAsync(SEARCHTERM_FILE, _sb.ToString());
-                _sb.Clear();
-                return (searchterm: _settings.SearchTerm, url: _settings.Url);
             }
         }
     }

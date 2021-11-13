@@ -15,12 +15,13 @@ namespace shopper.Features
     public class Scraper
     {
         private readonly CsvStorage _data;
+        private string _settingsFilePath;
 
-        public Scraper(CsvStorage data) => (_data) = (data);
+        public Scraper(CsvStorage data, string settingsFilePath) => (_data, _settingsFilePath) = (data, settingsFilePath);
 
         public List<Product> GoShopping()
         {
-            (string searchTerm, string url) = (_data.GetSettingsFromFile().Result.SearchTerm, _data.GetSettingsFromFile().Result.Url);
+            (string searchTerm, string url) = (_data.GetSettingsFromFile(_settingsFilePath).Result.SearchTerm, _data.GetSettingsFromFile(_settingsFilePath).Result.Url);
             string fileName = $"./Files/{searchTerm}.csv";
             var previouslyFoundItems = CsvStorage.GetProductListAsync(fileName);
             var foundItems = scrape(url).Result;
